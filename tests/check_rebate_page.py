@@ -17,7 +17,7 @@ PAGE = ROOT / "national-heat-pump-rebate.html"
 HOME = ROOT / "index.html"
 
 REQUIRED = [
-    "Information checked November 7, 2026. Verify the official program before purchasing.",
+    "Verify the official program before purchasing.",
     "not a Government of Canada website",
     "$2,000",
     "up to $10,000",
@@ -189,6 +189,23 @@ def main() -> int:
     for phrase in REQUIRED:
         if phrase not in page and phrase not in visible:
             errors.append(f"missing required phrase: {phrase}")
+
+    shown = re.sub(r"<!--.*?-->", " ", page, flags=re.S)
+    editorial = [
+        "Information checked",
+        "Checked November",
+        "November 7, 2026",
+        "2026-11-05",
+        "details stamp",
+        "when this summary was checked",
+    ]
+    for phrase in editorial:
+        if phrase in shown:
+            errors.append(f"editorial date still visible: {phrase}")
+    if "Source review November 7, 2026" not in page:
+        errors.append("internal source-review comment was removed")
+    if shown.count("Verify the official program before purchasing.") < 4:
+        errors.append("warning should remain in the hero, disclaimer, sources, and footer")
 
     lowered = page.lower()
     for phrase in FORBIDDEN:
