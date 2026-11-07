@@ -246,6 +246,63 @@ def main() -> int:
     if 'aria-current="page">National Heat Pump Rebate</a>' not in page:
         errors.append("rebate page nav should mark National Heat Pump Rebate as the current page")
 
+    policy_path = ROOT / "privacy-policy.html"
+    if not policy_path.is_file():
+        errors.append("privacy-policy.html is missing")
+    else:
+        policy = policy_path.read_text(encoding="utf-8")
+        policy_visible = re.sub(r"<!--.*?-->", " ", policy, flags=re.S)
+        for phrase in (
+            "Privacy Policy",
+            "vortexmech.inc@gmail.com",
+            "705-927-2262",
+            "https://policies.google.com/privacy",
+            "https://www.priv.gc.ca/en/report-a-concern/guide/",
+            "1APP",
+            "leadconnectorhq.com",
+            "msgsndr.com",
+            "GitHub Pages",
+            "Google Maps",
+            "Google Fonts",
+            "Booking does not sign you up for marketing",
+            "Browsing our website is not blanket consent",
+            "does not identify the model provider",
+            "Social Insurance Numbers",
+        ):
+            if phrase not in policy:
+                errors.append(f"privacy policy missing: {phrase}")
+        for phrase in (
+            "Draft — unpublished",
+            "Draft - unpublished",
+            "Information checked",
+            "lawyer",
+            "legal advice",
+            "compliance guarantee",
+            "does not use messages to train",
+            "no training",
+        ):
+            if phrase.lower() in policy_visible.lower():
+                errors.append(f"privacy policy should not show: {phrase}")
+        if "leadconnector" in policy.lower() and 'src="https://widgets.leadconnectorhq.com' in policy:
+            errors.append("privacy page should describe the chat host, not embed the chat loader")
+        if "<iframe" in policy.lower() or "form_embed.js" in policy:
+            errors.append("privacy page should not embed booking")
+        if 'href="privacy-policy.html" aria-current="page"' not in policy:
+            errors.append("privacy page footer should mark Privacy policy as current")
+
+    if 'href="privacy-policy.html"' not in home:
+        errors.append("homepage footer should link the privacy policy")
+    if 'href="privacy-policy.html"' not in page:
+        errors.append("rebate page footer should link the privacy policy")
+    if 'id="booking-privacy"' not in home or "does not sign you up for marketing" not in home:
+        errors.append("homepage booking notice is missing")
+    if "automated assistant, not a person" not in home:
+        errors.append("homepage AI chat disclosure is missing")
+    iframe_at = home.find('id="vortex_booking_iframe"')
+    notice_at = home.find('id="booking-privacy"')
+    if iframe_at == -1 or notice_at == -1 or not (notice_at < iframe_at):
+        errors.append("booking notice must sit outside and before the booking iframe")
+
     if errors:
         print("\n".join(errors))
         return 1
