@@ -314,7 +314,6 @@ def main() -> int:
             "Lennox outdoor unit installation",
             "Compact furnace installation",
             "Raised Mitsubishi Electric outdoor unit",
-            "Lennox ducted furnace installation",
         ]
         alts = [
             "Mitsubishi Electric outdoor unit on a metal stand beside a brick wall and fence.",
@@ -322,14 +321,15 @@ def main() -> int:
             "Lennox outdoor unit beside dark metal siding and a white garage door.",
             "Vertical furnace in an open utility closet with white vent pipes and metal ductwork.",
             "Mitsubishi Electric outdoor unit on a raised stand against a brick wall.",
-            "Lennox furnace with white vent pipes, metal ductwork and a white drain line.",
         ]
         for phrase in titles + alts:
             if phrase not in work:
                 errors.append(f"our work missing copy: {phrase}")
         photo_count = work.count('src="assets/our-work/')
-        if photo_count != 6:
-            errors.append(f"our work should show six photos, found {photo_count}")
+        if photo_count != 5:
+            errors.append(f"our work should show five photos, found {photo_count}")
+        if "Lennox ducted furnace installation" in work or "lennox-furnace.webp" in work:
+            errors.append("the Lennox ducted furnace installation should be removed")
         copy = work.split('<div class="work">', 1)[-1].split('<section class="work-cta">', 1)[0]
         for banned in (
             "SEER", "BTU", "warranty", "rebate", "Hyper Heating",
@@ -349,7 +349,6 @@ def main() -> int:
             "lennox-outdoor-unit.webp",
             "closet-furnace.webp",
             "raised-outdoor-unit.webp",
-            "lennox-furnace.webp",
         ):
             image = ROOT / "assets" / "our-work" / name
             if not image.is_file():
