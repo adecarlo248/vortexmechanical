@@ -356,6 +356,10 @@ def main() -> int:
                 errors.append(f"missing presentation image: {name}")
             elif image.stat().st_size > 400_000:
                 errors.append(f"{name} is larger than 400KB")
+    if "Review excerpts were sourced" in home:
+        errors.append("homepage footer should not show the Facebook review source line")
+    if 'class="secondary-cta our-work-cta" href="our-work.html"' not in home:
+        errors.append("homepage should offer a mobile Our Work call to action")
     for html_name in ("index.html", "national-heat-pump-rebate.html", "privacy-policy.html", "our-work.html"):
         html = (ROOT / html_name).read_text(encoding="utf-8")
         if 'href="our-work.html"' not in html:
