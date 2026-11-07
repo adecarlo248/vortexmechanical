@@ -185,6 +185,12 @@
       .page-hero::before,.page-hero::after{animation:none}
       *{transition:none!important}
     }
+    @media(max-width:900px){
+      .nav{height:auto;min-height:84px;padding:8px 0;align-items:center}
+      header .brand{flex:none;min-width:0}
+      header .brand img{width:auto;height:72px;max-width:46vw;max-height:none;aspect-ratio:936/711;object-fit:contain;object-position:center;background:#000;border-radius:0;padding:0}
+      footer.site-footer .footer-grid img{width:min(176px,58vw);height:auto;max-height:none;aspect-ratio:936/711;object-fit:contain;object-position:center;background:#000;border-radius:14px;padding:14px;box-sizing:content-box;margin-bottom:14px}
+    }
     @media print{
       .site-header,.mobile-bar,body::before{display:none}
       .page-hero{background:#fff;color:#000;padding:0}
