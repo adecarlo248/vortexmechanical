@@ -303,6 +303,68 @@ def main() -> int:
     if iframe_at == -1 or notice_at == -1 or not (notice_at < iframe_at):
         errors.append("booking notice must sit outside and before the booking iframe")
 
+    work_path = ROOT / "our-work.html"
+    if not work_path.is_file():
+        errors.append("our-work.html is missing")
+    else:
+        work = work_path.read_text(encoding="utf-8")
+        titles = [
+            "Mitsubishi Electric outdoor installation",
+            "Navien hydronic equipment installation",
+            "Lennox outdoor unit installation",
+            "Compact furnace installation",
+            "Raised Mitsubishi Electric outdoor unit",
+            "Lennox ducted furnace installation",
+        ]
+        alts = [
+            "Mitsubishi Electric outdoor unit on a metal stand beside a brick wall and fence.",
+            "Two wall-mounted Navien units with insulated piping and green circulation pumps.",
+            "Lennox outdoor unit beside dark metal siding and a white garage door.",
+            "Vertical furnace in an open utility closet with white vent pipes and metal ductwork.",
+            "Mitsubishi Electric outdoor unit on a raised stand against a brick wall.",
+            "Lennox furnace with white vent pipes, metal ductwork and a white drain line.",
+        ]
+        for phrase in titles + alts:
+            if phrase not in work:
+                errors.append(f"our work missing copy: {phrase}")
+        photo_count = work.count('src="assets/our-work/')
+        if photo_count != 6:
+            errors.append(f"our work should show six photos, found {photo_count}")
+        copy = work.split('<div class="work">', 1)[-1].split('<section class="work-cta">', 1)[0]
+        for banned in (
+            "SEER", "BTU", "warranty", "rebate", "Hyper Heating",
+            "originals/", "vortex-job-", "efficiency", "certified",
+        ):
+            if banned.lower() in copy.lower():
+                errors.append(f"our work descriptions should not include: {banned}")
+        if "form_embed.js" in work or "widgets.leadconnectorhq.com" in work or "<iframe" in work.lower():
+            errors.append("our work page should not add a booking or chat embed")
+        if 'href="index.html#book"' not in work:
+            errors.append("our work CTA should use the existing homepage booking section")
+        if 'aria-current="page">Our Work</a>' not in work:
+            errors.append("our work nav should mark Our Work as current")
+        for name in (
+            "mitsubishi-outdoor-unit.webp",
+            "navien-hydronic-system.webp",
+            "lennox-outdoor-unit.webp",
+            "closet-furnace.webp",
+            "raised-outdoor-unit.webp",
+            "lennox-furnace.webp",
+        ):
+            image = ROOT / "assets" / "our-work" / name
+            if not image.is_file():
+                errors.append(f"missing presentation image: {name}")
+            elif image.stat().st_size > 400_000:
+                errors.append(f"{name} is larger than 400KB")
+    for html_name in ("index.html", "national-heat-pump-rebate.html", "privacy-policy.html", "our-work.html"):
+        html = (ROOT / html_name).read_text(encoding="utf-8")
+        if 'href="our-work.html"' not in html:
+            errors.append(f"{html_name} should link to Our Work")
+        if ">Our Work</a>" not in html:
+            errors.append(f"{html_name} should show the Our Work label")
+    if (ROOT / "originals").exists() or list((ROOT / "assets").rglob("vortex-job-*")):
+        errors.append("private original job photos must not be in the site tree")
+
     if errors:
         print("\n".join(errors))
         return 1
