@@ -239,6 +239,12 @@ def main() -> int:
             errors.append(f"homepage booking/chat snippet missing: {snippet}")
     if "Heating & heat pumps" not in home:
         errors.append("homepage service card was not updated")
+    if '>Heat pumps</a>' in home or '>Heat pumps</a>' in page:
+        errors.append("nav label should be National Heat Pump Rebate, not Heat pumps")
+    if home.count('>National Heat Pump Rebate</a>') < 2:
+        errors.append("homepage nav and footer should both use National Heat Pump Rebate")
+    if 'aria-current="page">National Heat Pump Rebate</a>' not in page:
+        errors.append("rebate page nav should mark National Heat Pump Rebate as the current page")
 
     if errors:
         print("\n".join(errors))
