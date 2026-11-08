@@ -309,18 +309,18 @@ def main() -> int:
     else:
         work = work_path.read_text(encoding="utf-8")
         titles = [
-            "Mitsubishi Electric outdoor installation",
+            "Mitsubishi Electric Hyper Heat-Pump installation",
             "Navien hydronic equipment installation",
             "Lennox outdoor unit installation",
             "Compact furnace installation",
-            "Raised Mitsubishi Electric outdoor unit",
+            "Raised Mitsubishi Electric Hyper Heat-Pump",
         ]
         alts = [
-            "Mitsubishi Electric outdoor unit on a metal stand beside a brick wall and fence.",
+            "Mitsubishi Electric Hyper Heat-Pump on a metal stand beside a brick wall and fence.",
             "Two wall-mounted Navien units with insulated piping and green circulation pumps.",
             "Lennox outdoor unit beside dark metal siding and a white garage door.",
             "Vertical furnace in an open utility closet with white vent pipes and metal ductwork.",
-            "Mitsubishi Electric outdoor unit on a raised stand against a brick wall.",
+            "Mitsubishi Electric Hyper Heat-Pump on a raised stand against a brick wall.",
         ]
         for phrase in titles + alts:
             if phrase not in work:
@@ -330,6 +330,15 @@ def main() -> int:
             errors.append(f"our work should show five photos, found {photo_count}")
         if "Lennox ducted furnace installation" in work or "lennox-furnace.webp" in work:
             errors.append("the Lennox ducted furnace installation should be removed")
+        intro = "A look at Vortex Mechanical installations, including heat pump systems, boilers and furnaces."
+        if work.count(intro) < 3:
+            errors.append("intro should be in the page, meta description, and social description")
+        if "outdoor comfort" in work.lower():
+            errors.append("old outdoor comfort wording remains")
+        if "Hyper-Heat heat pump" in work or "hyper heat heat pump" in work.lower():
+            errors.append("Hyper Heat-Pump wording is doubled")
+        if work.count("Hyper Heat-Pump") != 6:
+            errors.append(f"Hyper Heat-Pump should appear only on the two Mitsubishi entries, found {work.count('Hyper Heat-Pump')}")
         copy = work.split('<div class="work">', 1)[-1].split('<section class="work-cta">', 1)[0]
         for banned in (
             "SEER", "BTU", "warranty", "rebate", "Hyper Heating",
